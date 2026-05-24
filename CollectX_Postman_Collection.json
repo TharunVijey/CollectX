@@ -1,0 +1,767 @@
+{
+  "info": {
+    "name": "CollectX — Enterprise Collections Platform",
+    "description": "Complete API collection for CollectX. \n\n**HOW TO USE:**\n1. Import this file into Postman\n2. Import the Environment file too\n3. Run '🔐 Login' first — token is saved automatically\n4. All other requests use {{token}} automatically",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8888", "type": "string" },
+    { "key": "token",   "value": "", "type": "string" }
+  ],
+  "item": [
+
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('token', res.token);",
+                  "    pm.collectionVariables.set('userId', res.userId);",
+                  "    console.log('✅ Token saved automatically');",
+                  "} else {",
+                  "    console.log('❌ Login failed:', JSON.stringify(res));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@collectx.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "description": "Login and get JWT token. Token is auto-saved to collection variable."
+          }
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Agent\",\n  \"email\": \"john.agent@collectx.com\",\n  \"password\": \"Agent@123\",\n  \"role\": \"AGENT\",\n  \"phone\": \"9876543210\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "description": "Register a new user. Role: ADMIN / SUPERVISOR / AGENT / COMPLIANCE / FIELD_AGENT"
+          }
+        },
+        {
+          "name": "Get All Agents",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/agents", "host": ["{{baseUrl}}"], "path": ["auth","agents"] },
+            "description": "Returns list of all agents (for dropdowns in UI)"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "👤 Admin — User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/users", "host": ["{{baseUrl}}"], "path": ["admin","users"] }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Supervisor\",\n  \"email\": \"priya@collectx.com\",\n  \"password\": \"Super@123\",\n  \"role\": \"SUPERVISOR\",\n  \"phone\": \"9123456789\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/users", "host": ["{{baseUrl}}"], "path": ["admin","users"] }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Updated\",\n  \"phone\": \"9999999999\",\n  \"role\": \"SUPERVISOR\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/users/1", "host": ["{{baseUrl}}"], "path": ["admin","users","1"] }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/users/1", "host": ["{{baseUrl}}"], "path": ["admin","users","1"] }
+          }
+        },
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/audit-logs", "host": ["{{baseUrl}}"], "path": ["admin","audit-logs"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "📊 Portfolio — Loan Accounts",
+      "item": [
+        {
+          "name": "Get All Loans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/portfolio/loans", "host": ["{{baseUrl}}"], "path": ["portfolio","loans"] }
+          }
+        },
+        {
+          "name": "Create Loan",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"product\": \"HOME_LOAN\",\n  \"principalOS\": 500000.00,\n  \"interestOS\": 25000.00,\n  \"lastPaymentDate\": \"2025-01-15\",\n  \"region\": \"Mumbai North\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/portfolio/loan", "host": ["{{baseUrl}}"], "path": ["portfolio","loan"] },
+            "description": "product options: HOME_LOAN / PERSONAL_LOAN / AUTO_LOAN / BUSINESS_LOAN / GOLD_LOAN / EDUCATION_LOAN"
+          }
+        },
+        {
+          "name": "Get Loan by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/portfolio/loan/1", "host": ["{{baseUrl}}"], "path": ["portfolio","loan","1"] }
+          }
+        },
+        {
+          "name": "Get Loans by Customer",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/portfolio/customer/1", "host": ["{{baseUrl}}"], "path": ["portfolio","customer","1"] }
+          }
+        },
+        {
+          "name": "Trigger Strategy Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/portfolio/strategy/assign", "host": ["{{baseUrl}}"], "path": ["portfolio","strategy","assign"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🧑‍💼 Agent Workbench",
+      "item": [
+        {
+          "name": "Get Cases by Loan",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/agent/cases/1", "host": ["{{baseUrl}}"], "path": ["agent","cases","1"] },
+            "description": "Replace 1 with loanAccountId"
+          }
+        },
+        {
+          "name": "Create Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"caseType\": \"COLLECTIONS\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/agent/case", "host": ["{{baseUrl}}"], "path": ["agent","case"] },
+            "description": "caseType: HARD_SHIP / LEGAL / COLLECTIONS\npriority: LOW / MEDIUM / HIGH / CRITICAL"
+          }
+        },
+        {
+          "name": "Get Notes by Loan",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/agent/notes/loan/1", "host": ["{{baseUrl}}"], "path": ["agent","notes","loan","1"] }
+          }
+        },
+        {
+          "name": "Add Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"note\": \"Customer promised to pay by end of month\",\n  \"noteType\": \"PTP\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/agent/note", "host": ["{{baseUrl}}"], "path": ["agent","note"] },
+            "description": "noteType: CALL / VISIT / PTP / PAYMENT / GENERAL"
+          }
+        },
+        {
+          "name": "Get Tasks by Agent",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/agent/tasks/agent/1", "host": ["{{baseUrl}}"], "path": ["agent","tasks","agent","1"] }
+          }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"dueDate\": \"2025-06-15\",\n  \"taskType\": \"CALL\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/agent/task", "host": ["{{baseUrl}}"], "path": ["agent","task"] },
+            "description": "taskType: CALL / VISIT / EMAIL / PTP_FOLLOW_UP\npriority: LOW / MEDIUM / HIGH / CRITICAL"
+          }
+        },
+        {
+          "name": "Mark Task as DONE",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/agent/task/1/status?status=DONE",
+              "host": ["{{baseUrl}}"],
+              "path": ["agent","task","1","status"],
+              "query": [{ "key": "status", "value": "DONE" }]
+            },
+            "description": "status options: PENDING / IN_PROGRESS / DONE"
+          }
+        },
+        {
+          "name": "Log Hardship",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"hardshipType\": \"JOB_LOSS\",\n  \"description\": \"Customer lost job in January 2025\",\n  \"requestedAction\": \"EMI_HOLIDAY\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/agent/hardship", "host": ["{{baseUrl}}"], "path": ["agent","hardship"] }
+          }
+        },
+        {
+          "name": "Get Hardship by Loan",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/agent/hardship/loan/1", "host": ["{{baseUrl}}"], "path": ["agent","hardship","loan","1"] }
+          }
+        },
+        {
+          "name": "Get All Hardships",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/agent/hardships", "host": ["{{baseUrl}}"], "path": ["agent","hardships"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "💳 Payments & PTP",
+      "item": [
+        {
+          "name": "Get All PTPs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/payment/ptp/all", "host": ["{{baseUrl}}"], "path": ["payment","ptp","all"] }
+          }
+        },
+        {
+          "name": "Get PTP by Loan",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/payment/ptp/loan/1", "host": ["{{baseUrl}}"], "path": ["payment","ptp","loan","1"] }
+          }
+        },
+        {
+          "name": "Create PTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"customerId\": 1,\n  \"promisedAmount\": 15000.00,\n  \"promisedDate\": \"2025-06-30\",\n  \"channel\": \"CALL\",\n  \"promisedBy\": \"Rahul Kumar\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/payment/ptp", "host": ["{{baseUrl}}"], "path": ["payment","ptp"] },
+            "description": "channel: CALL / SMS / EMAIL / VISIT"
+          }
+        },
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/payment/payments", "host": ["{{baseUrl}}"], "path": ["payment","payments"] }
+          }
+        },
+        {
+          "name": "Record Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"customerId\": 1,\n  \"amount\": 15000.00,\n  \"paymentMode\": \"UPI\",\n  \"referenceNumber\": \"UPI202506151234\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/payment/create", "host": ["{{baseUrl}}"], "path": ["payment","create"] },
+            "description": "paymentMode: CASH / CHEQUE / UPI / NEFT / RTGS"
+          }
+        },
+        {
+          "name": "Get All Settlements",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/payment/settlements", "host": ["{{baseUrl}}"], "path": ["payment","settlements"] }
+          }
+        },
+        {
+          "name": "Request Settlement (OTS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"customerId\": 1,\n  \"settlementAmount\": 450000.00,\n  \"waiverAmount\": 50000.00,\n  \"reason\": \"Customer facing severe financial hardship, OTS recommended\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/payment/settlement", "host": ["{{baseUrl}}"], "path": ["payment","settlement"] }
+          }
+        },
+        {
+          "name": "Approve / Reject Settlement",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/payment/settlement/1/approve?decision=APPROVED",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment","settlement","1","approve"],
+              "query": [{ "key": "decision", "value": "APPROVED", "description": "APPROVED or REJECTED" }]
+            },
+            "description": "decision: APPROVED or REJECTED. Replace 1 with settlement ID."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🚗 Field Collections",
+      "item": [
+        {
+          "name": "Get All Visits",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/field/visits", "host": ["{{baseUrl}}"], "path": ["field","visits"] }
+          }
+        },
+        {
+          "name": "Schedule Visit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"customerId\": 1,\n  \"visitDate\": \"2025-06-20\",\n  \"address\": \"123 MG Road, Mumbai 400001\",\n  \"visitType\": \"SCHEDULED\",\n  \"outcome\": null,\n  \"notes\": \"First field visit attempt\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/field/visit", "host": ["{{baseUrl}}"], "path": ["field","visit"] },
+            "description": "visitType: SCHEDULED / COMPLETED\noutcome: CONNECTED / NOT_HOME / REFUSED / PARTIAL_PAYMENT / PTP_GIVEN"
+          }
+        },
+        {
+          "name": "Log Completed Visit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"agentId\": 1,\n  \"customerId\": 1,\n  \"visitDate\": \"2025-06-15\",\n  \"address\": \"123 MG Road, Mumbai 400001\",\n  \"visitType\": \"COMPLETED\",\n  \"outcome\": \"PTP_GIVEN\",\n  \"notes\": \"Customer promised ₹10,000 by June 30\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/field/visit", "host": ["{{baseUrl}}"], "path": ["field","visit"] }
+          }
+        },
+        {
+          "name": "Get All Repossessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/field/repossessions", "host": ["{{baseUrl}}"], "path": ["field","repossessions"] }
+          }
+        },
+        {
+          "name": "Create Repossession",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"customerId\": 1,\n  \"agentId\": 1,\n  \"assetDescription\": \"Honda City 2020 - MH01AB1234\",\n  \"repossessionDate\": \"2025-06-10\",\n  \"notes\": \"Vehicle repossessed from customer residence\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/field/repossession", "host": ["{{baseUrl}}"], "path": ["field","repossession"] }
+          }
+        },
+        {
+          "name": "Get All Agencies",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/field/agencies", "host": ["{{baseUrl}}"], "path": ["field","agencies"] }
+          }
+        },
+        {
+          "name": "Register Agency",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agencyName\": \"Mumbai Recovery Services\",\n  \"contactPerson\": \"Raj Mehta\",\n  \"phone\": \"9876543210\",\n  \"email\": \"raj@mumbairecovery.com\",\n  \"territory\": \"Mumbai North\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/field/agency", "host": ["{{baseUrl}}"], "path": ["field","agency"] }
+          }
+        },
+        {
+          "name": "Get Agency Placements",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/field/agency-placements", "host": ["{{baseUrl}}"], "path": ["field","agency-placements"] }
+          }
+        },
+        {
+          "name": "Create Agency Placement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"customerId\": 1,\n  \"agencyId\": 1,\n  \"placementDate\": \"2025-06-01\",\n  \"notes\": \"Placed with agency for field recovery\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/field/agency-placement", "host": ["{{baseUrl}}"], "path": ["field","agency-placement"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "⚖️ Legal & Write-Off",
+      "item": [
+        {
+          "name": "Get All Legal Actions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/legal/actions", "host": ["{{baseUrl}}"], "path": ["legal","actions"] }
+          }
+        },
+        {
+          "name": "File Legal Action",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"customerId\": 1,\n  \"actionType\": \"NOTICE\",\n  \"caseNumber\": \"CASE-2025-001\",\n  \"courtName\": \"Mumbai Civil Court\",\n  \"filedDate\": \"2025-06-01\",\n  \"notes\": \"Demand notice issued under Section 138 NI Act\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/legal/action", "host": ["{{baseUrl}}"], "path": ["legal","action"] },
+            "description": "actionType: NOTICE / SUMMONS / ARBITRATION / CIVIL_SUIT / CRIMINAL_COMPLAINT / LOK_ADALAT"
+          }
+        },
+        {
+          "name": "Get All Write-Offs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/legal/writeoffs", "host": ["{{baseUrl}}"], "path": ["legal","writeoffs"] }
+          }
+        },
+        {
+          "name": "Create Write-Off (ADMIN only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"customerId\": 1,\n  \"writeOffAmount\": 500000.00,\n  \"reason\": \"Account classified as NPA for over 12 months. No recovery possible.\",\n  \"writeOffDate\": \"2025-06-15\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/legal/writeoff", "host": ["{{baseUrl}}"], "path": ["legal","writeoff"] }
+          }
+        },
+        {
+          "name": "Get All Recoveries",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/legal/recoveries", "host": ["{{baseUrl}}"], "path": ["legal","recoveries"] }
+          }
+        },
+        {
+          "name": "Log Recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1,\n  \"customerId\": 1,\n  \"recoveredAmount\": 120000.00,\n  \"recoveryDate\": \"2025-06-20\",\n  \"recoveryMethod\": \"AUCTION\",\n  \"notes\": \"Recovered via asset auction\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/legal/recovery", "host": ["{{baseUrl}}"], "path": ["legal","recovery"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🎯 Strategy & Queues",
+      "item": [
+        {
+          "name": "Get All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/strategy/assignments", "host": ["{{baseUrl}}"], "path": ["strategy","assignments"] }
+          }
+        },
+        {
+          "name": "Get All Rules",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/strategy/rules", "host": ["{{baseUrl}}"], "path": ["strategy","rules"] }
+          }
+        },
+        {
+          "name": "Create Strategy Rule (ADMIN only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"High Risk 90+ Rule\",\n  \"bucket\": \"90+\",\n  \"riskBand\": \"HIGH\",\n  \"expression\": \"bucket=90+&riskBand=HIGH\",\n  \"priority\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/strategy/rule", "host": ["{{baseUrl}}"], "path": ["strategy","rule"] },
+            "description": "bucket: 0-30 / 31-60 / 61-90 / 90+\nriskBand: LOW / MED / HIGH"
+          }
+        },
+        {
+          "name": "Get All Queues",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/strategy/queues", "host": ["{{baseUrl}}"], "path": ["strategy","queues"] }
+          }
+        },
+        {
+          "name": "Create Queue",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mumbai High-Risk\",\n  \"bucketScope\": \"90+\",\n  \"territory\": \"Mumbai North\",\n  \"capacity\": 50\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/strategy/queue", "host": ["{{baseUrl}}"], "path": ["strategy","queue"] }
+          }
+        },
+        {
+          "name": "Run Auto-Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanAccountId\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/strategy/assign", "host": ["{{baseUrl}}"], "path": ["strategy","assign"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "📈 Reports & Analytics",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/report/all", "host": ["{{baseUrl}}"], "path": ["report","all"] }
+          }
+        },
+        {
+          "name": "Get KPI Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/report/kpi", "host": ["{{baseUrl}}"], "path": ["report","kpi"] }
+          }
+        },
+        {
+          "name": "Get Agent Performance",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/report/agent-performance", "host": ["{{baseUrl}}"], "path": ["report","agent-performance"] }
+          }
+        },
+        {
+          "name": "Get Cash Flow",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/report/cash-flow", "host": ["{{baseUrl}}"], "path": ["report","cash-flow"] }
+          }
+        },
+        {
+          "name": "Get Bucket Distribution",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/report/bucket-distribution", "host": ["{{baseUrl}}"], "path": ["report","bucket-distribution"] }
+          }
+        },
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportType\": \"MONTHLY_COLLECTIONS\",\n  \"fromDate\": \"2025-06-01\",\n  \"toDate\": \"2025-06-30\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/report/generate", "host": ["{{baseUrl}}"], "path": ["report","generate"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🏥 Health Checks",
+      "item": [
+        {
+          "name": "API Gateway Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/actuator/health", "host": ["{{baseUrl}}"], "path": ["actuator","health"] }
+          }
+        },
+        {
+          "name": "Eureka Dashboard",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8761", "raw": "http://localhost:8761" }
+          }
+        }
+      ]
+    }
+
+  ]
+}
